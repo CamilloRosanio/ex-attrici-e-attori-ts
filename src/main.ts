@@ -87,3 +87,28 @@ async function getActress(id: number): Promise<Actress | null> {
     return null;
   }
 }
+
+
+async function getAllActresses(): Promise<Actress[]> {
+  try {
+    const response = await fetch('https://boolean-spec-frontend.vercel.app/freetestapi/actresses');
+    if (!response.ok) {
+      throw new Error(`Errore HTTP ${response.status}:  ${response.statusText}`)
+    }
+    const dati = await response.json();
+    if (!(dati instanceof Array)) {
+      throw new Error('Formato dei dati non valido: non è un Array!')
+    }
+    // Qui controllo se effettivamente ogni elemento dell'Array sia un ALIAS di Actress
+    const attriciValide: Actress[] = dati.filter(a => isActress(a)) // Posso anche scrivere dati.filter(isActress) per eseguire la TYPEGUARD e scriverlo in modo compatto
+    return attriciValide; // Non specifico che il RETURN rende un Array di Actress perchè per INFERENCE TS già lo sa e lo deduce.
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error('Errore durante il recupero dell\'attrice:', error);
+    } else {
+      console.error('Errore sconosciuto:', error)
+    }
+    // Se c'è un errore in questo caso ritorno un Array vuoto.
+    return [];
+  }
+}
