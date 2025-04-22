@@ -116,6 +116,7 @@ async function getAllActresses(): Promise<Actress[]> {
 
 async function getActresses(ids: number[]): Promise<(Actress | null)[]> {
   try {
+    // Creo il mio Array di Promises tramite MAP per comodità
     const promises = ids.map(id => getActress(id));
     const actresses = await Promise.all(promises);
     return actresses;
@@ -127,5 +128,36 @@ async function getActresses(ids: number[]): Promise<(Actress | null)[]> {
     }
     // Se c'è un errore in questo caso ritorno un Array vuoto.
     return [];
+  }
+}
+
+
+// Per servirmi di tutte le proprietà dell'ALIAS Actress tranne l'id, sfrutto l'Omit, perchè l'id lo andrò a creare io.
+function createActress(data: Omit<Actress, "id">): Actress {
+  return {
+    ...data,
+    // Qui andrebbe eseguita la mia funzione centralizzata per creare id, ma in questo caso sfrutto un banale Math.random per dimostrazione
+    id: Math.floor(Math.random() * 10000),
+  }
+}
+
+
+// Sfrutto il PARTIAL per poter modificare una qualunque delle KEY della Actress a mio piacimento
+function updateActress(actress: Actress, updates: Partial<Omit<Actress, "id" | "name">>): Actress {
+
+  // V1
+  // Faccio il RETURN riutilizzando id e name, in modo tale che qualsiasi cosa io faccia vengano ritilizzati i valori originali
+  // return {
+  //   ...actress,
+  //   ...updates,
+  //   id: actress.id,
+  //   name: actress.name,
+  // }
+
+  // V2
+  // Per non sovradcrivere "name" e "id" posso sfruttare OMIT nei parametri che passo, così da escludere modifiche a "id" e "name"
+  return {
+    ...actress,
+    ...updates,
   }
 }
